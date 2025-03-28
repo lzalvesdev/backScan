@@ -9,11 +9,13 @@ module.exports = async (req, res) => {
   if (req.method === 'POST') {
     const { latitude, longitude } = req.body;
 
-    if (!latitude || !longitude) {
-      return res.status(400).json({ message: 'Localização não fornecida' });
-    }
+    let message = '';
 
-    const message = `Golpista acessou o site. Localização: https://www.google.com/maps?q=${latitude},${longitude}`;
+    if (!latitude || !longitude) {
+      message = `Golpista acessou o site, mas recusou compartilhar a localização.`;
+    } else {
+      message = `Golpista acessou o site. Localização: https://www.google.com/maps?q=${latitude},${longitude}`;
+    }
 
     try {
       await axios.post(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
